@@ -22,11 +22,11 @@
         const userId = urlParams.get('user');
 
         if (userId) {
-            // Đã gắn domain Render của bạn vào đây
-            const RENDER_DOMAIN = "https://api-code-bot.onrender.com";
+            // Thay link trong ngoặc kép bên dưới bằng domain thật của bạn trên Railway
+            const RAILWAY_DOMAIN = "https://web-production-xxxx.up.railway.app";
 
-            // Tự động chuyển hướng sang API hoàn thành của bot trên Render
-            window.location.href = `${RENDER_DOMAIN}/complete?user_id=${userId}`;
+            // Tự động chuyển hướng sang API hoàn thành của bot trên Railway
+            window.location.href = `${RAILWAY_DOMAIN}/complete?user_id=${userId}`;
         } else {
             document.querySelector("h1").style.color = "red";
             document.querySelector("h1").innerText = "❌ Lỗi: Không tìm thấy thông tin người dùng!";
