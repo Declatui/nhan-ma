@@ -88,10 +88,9 @@
         const userId = urlParams.get('user');
 
         if (userId) {
-            // Thay đường dẫn domain Railway của bạn vào đây
-            const RAILWAY_DOMAIN = "https://web-production-xxxx.up.railway.app";
+            // Đã gắn domain Railway chính thức của bạn vào đây
+            const RAILWAY_DOMAIN = "https://cay-coin-production.up.railway.app";
 
-            // Giả lập thời gian ngắn để hiện thông báo chúc mừng mượt mà trước khi gọi API hoàn thành
             setTimeout(() => {
                 document.getElementById("loader").style.display = "none";
                 const cardBox = document.getElementById("card-box");
@@ -100,10 +99,9 @@
                 document.getElementById("title").innerText = "Vượt Link Thành Công!";
                 document.getElementById("desc").innerHTML = "Chúc mừng bạn đã hoàn thành nhiệm vụ.<br>Hệ thống đang gửi phần thưởng về Discord!";
                 
-                // Thêm huy hiệu nhận coin cho sinh động
                 cardBox.insertAdjacentHTML('beforeend', '<div class="coin-badge">🪙 +100 Coin Đã Được Ghi Nhận</div>');
 
-                // Sau 2 giây tiếp theo mới chuyển hướng về server Flask trên Railway để cộng điểm
+                // Chuyển hướng về API complete trên Railway[cite: 3]
                 setTimeout(() => {
                     window.location.href = `${RAILWAY_DOMAIN}/complete?user_id=${userId}`;
                 }, 2000);
@@ -121,5 +119,4 @@
         }
     </script>
 </body>
-    </html>
-    
+</html>
