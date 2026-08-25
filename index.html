@@ -3,119 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xác Nhận Vượt Link - Nhận Coin Thành Công</title>
+    <title>Xác Thực Nhận Coin</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #0f172a;
+            color: #ffffff;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: #333;
+            height: 100vh;
+            margin: 0;
         }
         .card {
-            background: #ffffff;
-            padding: 40px 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            background-color: #1e293b;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
             text-align: center;
-            max-width: 420px;
-            width: 90%;
-            animation: fadeIn 0.5s ease-in-out;
+            max-width: 400px;
+            width: 100%;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .spinner {
-            margin: 20px auto;
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #48bb78;
+        h2 { color: #38bdf8; margin-bottom: 10px; }
+        p { color: #94a3b8; font-size: 14px; }
+        .loader {
+            border: 4px solid #334155;
+            border-top: 4px solid #38bdf8;
             border-radius: 50%;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
+            margin: 20px auto;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .icon-success {
-            font-size: 50px;
-            margin-bottom: 10px;
-            animation: bounce 0.6s ease infinite alternate;
-        }
-        @keyframes bounce {
-            from { transform: translateY(0); }
-            to { transform: translateY(-8px); }
-        }
-        h1 {
-            color: #2d3748;
-            font-size: 22px;
-            margin-bottom: 12px;
-        }
-        p {
-            color: #718096;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        .coin-badge {
-            display: inline-block;
-            background: #feebc8;
-            color: #dd6b20;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 15px;
-            margin-top: 15px;
-        }
-        .error {
-            color: #e53e3e !important;
-        }
     </style>
 </head>
 <body>
-    <div class="card" id="card-box">
-        <div id="loader" class="spinner"></div>
-        <h1 id="title">Đang xác thực vượt link...</h1>
-        <p id="desc">Hệ thống đang kiểm tra lượt vượt link của bạn, vui lòng đợi trong giây lát.</p>
+    <div class="card">
+        <h2>Đang Xác Thực...</h2>
+        <div class="loader"></div>
+        <p id="status-text">Hệ thống đang ghi nhận lượt vượt link của bạn, vui lòng đợi trong giây lát!</p>
     </div>
 
     <script>
+        // URL của Web Server Flask trên Railway của bạn
+        const API_RENDER_URL = "https://cay-coin-production.up.railway.app";
+
+        // Lấy tham số 'user' từ đường dẫn URL
         const urlParams = new URLSearchParams(window.location.search);
         const userId = urlParams.get('user');
 
         if (userId) {
-            // Đã gắn domain Railway chính thức của bạn vào đây
-            const RAILWAY_DOMAIN = "https://cay-coin-production.up.railway.app";
-
-            setTimeout(() => {
-                document.getElementById("loader").style.display = "none";
-                const cardBox = document.getElementById("card-box");
-                
-                cardBox.insertAdjacentHTML('afterbegin', '<div class="icon-success">🎉</div>');
-                document.getElementById("title").innerText = "Vượt Link Thành Công!";
-                document.getElementById("desc").innerHTML = "Chúc mừng bạn đã hoàn thành nhiệm vụ.<br>Hệ thống đang gửi phần thưởng về Discord!";
-                
-                cardBox.insertAdjacentHTML('beforeend', '<div class="coin-badge">🪙 +100 Coin Đã Được Ghi Nhận</div>');
-
-                // Chuyển hướng về API complete trên Railway[cite: 3]
-                setTimeout(() => {
-                    window.location.href = `${RAILWAY_DOMAIN}/complete?user_id=${userId}`;
-                }, 2000);
-
-            }, 1200); 
-
+            // Tự động gọi sang server Flask để hoàn tất nhiệm vụ
+            fetch(`${API_RENDER_URL}/complete?user_id=${userId}`)
+                .then(response => {
+                    if (response.ok) {
+                        document.querySelector('.card').innerHTML = `
+                            <h2 style="color: #4ade80;">🎉 Thành Công!</h2>
+                            <p style="color: #f8fafc; font-size: 16px; margin-top: 15px;">Đã ghi nhận lượt vượt link của bạn.</p>
+                            <p style="margin-top: 20px;">Bạn có thể đóng trang này và quay lại Discord để nhận thưởng!</p>
+                        `;
+                    } else {
+                        throw new Error();
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('status-text').innerText = "⚠️ Có lỗi xảy ra khi xác thực, vui lòng thử lại!";
+                });
         } else {
-            document.getElementById("loader").style.display = "none";
-            const titleEl = document.getElementById("title");
-            const descEl = document.getElementById("desc");
-            
-            titleEl.classList.add("error");
-            titleEl.innerText = "❌ Thiếu thông tin người dùng!";
-            descEl.innerText = "Đường dẫn không hợp lệ hoặc thiếu tham số xác thực từ bot.";
+            document.querySelector('.card').innerHTML = `
+                <h2 style="color: #f87171;">⚠️ Lỗi Liên Kết</h2>
+                <p>Không tìm thấy thông tin định danh người dùng trong đường dẫn.</p>
+            `;
         }
     </script>
 </body>
