@@ -5,79 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xác Thực Nhận Coin</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #0f172a;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .card {
-            background-color: #1e293b;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-        }
-        h2 { color: #38bdf8; margin-bottom: 10px; }
-        p { color: #94a3b8; font-size: 14px; }
-        .loader {
-            border: 4px solid #334155;
-            border-top: 4px solid #38bdf8;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        body { font-family: Arial, sans-serif; background-color: #0f172a; color: #fff; text-align: center; padding-top: 50px; }
+        .box { background: #1e293b; padding: 30px; border-radius: 12px; display: inline-block; max-width: 400px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        h1 { color: #38bdf8; font-size: 22px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>Đang Xác Thực...</h2>
-        <div class="loader"></div>
-        <p id="status-text">Hệ thống đang ghi nhận lượt vượt link của bạn, vui lòng đợi trong giây lát!</p>
+    <div class="box" id="content">
+        <h1>⏳ Đang xác thực hệ thống...</h1>
+        <p>Vui lòng chờ trong giây lát trong lúc hệ thống ghi nhận kết quả của bạn.</p>
     </div>
 
     <script>
-        // URL của Web Server Flask trên Railway của bạn
-        const API_RENDER_URL = "https://cay-coin-production.up.railway.app";
-
-        // Lấy tham số 'user' từ đường dẫn URL
+        // Đọc các tham số trên URL (hỗ trợ cả r và user)
         const urlParams = new URLSearchParams(window.location.search);
         const userId = urlParams.get('user');
+        
+        const boxContent = document.getElementById('content');
 
-        if (userId) {
-            // Tự động gọi sang server Flask để hoàn tất nhiệm vụ
-            fetch(`${API_RENDER_URL}/complete?user_id=${userId}`)
-                .then(response => {
-                    if (response.ok) {
-                        document.querySelector('.card').innerHTML = `
-                            <h2 style="color: #4ade80;">🎉 Thành Công!</h2>
-                            <p style="color: #f8fafc; font-size: 16px; margin-top: 15px;">Đã ghi nhận lượt vượt link của bạn.</p>
-                            <p style="margin-top: 20px;">Bạn có thể đóng trang này và quay lại Discord để nhận thưởng!</p>
-                        `;
-                    } else {
-                        throw new Error();
-                    }
-                })
-                .catch(() => {
-                    document.getElementById('status-text').innerText = "⚠️ Có lỗi xảy ra khi xác thực, vui lòng thử lại!";
-                });
+        if (!userId) {
+            boxContent.innerHTML = "<h1>⚠️ Lỗi Liên Kết</h1><p>Không tìm thấy thông tin định danh người dùng trong đường dẫn.</p>";
         } else {
-            document.querySelector('.card').innerHTML = `
-                <h2 style="color: #f87171;">⚠️ Lỗi Liên Kết</h2>
-                <p>Không tìm thấy thông tin định danh người dùng trong đường dẫn.</p>
-            `;
+            // URL của Web Server Flask đang chạy trên Railway (khớp với file bot của bạn)
+            const apiRailwayUrl = "https://cay-coin-production.up.railway.app";
+
+            // Gửi tín hiệu hoàn thành về Server
+            fetch(`${apiRailwayUrl}/complete?user_id=${userId}`)
+                .then(response => response.text())
+                .then(data => {
+                    boxContent.innerHTML = data; // Hiển thị thông báo thành công từ server
+                })
+                .catch(error => {
+                    console.error("Lỗi kết nối:", error);
+                    boxContent.innerHTML = "<h1>❌ Lỗi kết nối đến máy chủ!</h1><p>Không thể gửi tín hiệu xác thực về hệ thống.</p>";
+                });
         }
     </script>
 </body>
