@@ -3,42 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xác Thực Vượt Link</title>
+    <title>Xác Nhận Vượt Link</title>
     <style>
-        body { background: #0f172a; color: #f8fafc; font-family: sans-serif; text-align: center; padding-top: 100px; }
-        .box { background: #1e293b; padding: 40px; border-radius: 12px; display: inline-block; max-width: 400px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-        h2 { color: #38bdf8; }
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f9; }
+        .container { background: white; padding: 30px; border-radius: 10px; display: inline-block; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
+        h1 { color: #28a745; }
     </style>
 </head>
 <body>
-    <div class="box" id="content">
-        <h2>⏳ Đang xác thực...</h2>
-        <p>Vui lòng đợi trong giây lát hệ thống đang ghi nhận kết quả!</p>
+    <div class="container">
+        <h1>🎉 Đang xác thực vượt link...</h1>
+        <p>Vui lòng chờ trong giây lát, hệ thống đang kết nối với bot Discord...</p>
     </div>
 
     <script>
-        const LINK_API = "https://api-code-bot.onrender.com";
+        // Lấy user_id từ URL (ví dụ: ?user=123456789)
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('user');
 
-        async function verify() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const userId = urlParams.get('user');
+        if (userId) {
+            // Đã gắn domain Render của bạn vào đây
+            const RENDER_DOMAIN = "https://api-code-bot.onrender.com";
 
-            if (!userId) {
-                document.getElementById("content").innerHTML = "<h2>❌ Lỗi!</h2><p>Đường dẫn không hợp lệ.</p>";
-                return;
-            }
-
-            try {
-                let res = await fetch(`${LINK_API}/complete?user_id=${userId}`);
-                if (res.ok) {
-                    document.getElementById("content").innerHTML = "<h2>🎉 Thành Công!</h2><p>Đã xác thực vượt link thành công! Bạn hãy quay lại Discord để nhận coin nhé.</p>";
-                }
-            } catch (e) {
-                document.getElementById("content").innerHTML = "<h2>⚠️ Lỗi kết nối!</h2><p>Không thể kết nối đến máy chủ xác thực.</p>";
-            }
+            // Tự động chuyển hướng sang API hoàn thành của bot trên Render
+            window.location.href = `${RENDER_DOMAIN}/complete?user_id=${userId}`;
+        } else {
+            document.querySelector("h1").style.color = "red";
+            document.querySelector("h1").innerText = "❌ Lỗi: Không tìm thấy thông tin người dùng!";
+            document.querySelector("p").innerText = "Đường dẫn không hợp lệ hoặc thiếu tham số user.";
         }
-
-        verify();
     </script>
 </body>
 </html>
